@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowRecall - Unity Selection History Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Optional: Add a Favicon later -->
+    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
+
+    <style>
+        /* --- Base Styles & Variables --- */
+        :root {
+            --primary-color: #2a7ae2; /* A nice blue */
+            --secondary-color: #1a4c8b; /* Darker blue */
+            --accent-color: #5dade2; /* Lighter blue */
+            --light-bg: #f8f9fa; /* Very light grey for alternating sections */
+            --dark-text: #333;
+            --light-text: #fff;
+            --border-color: #ddd;
+            --header-bg: #2c3e50; /* Dark blue/grey */
+            --footer-bg: #1c2833; /* Even darker */
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: var(--dark-text);
+            line-height: 1.6;
+            background-color: var(--light-text); /* Default background */
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--secondary-color);
+            margin-bottom: 0.8em;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 0.2em;
+        }
+
+        h2 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 1.5em;
+            padding-top: 1em; /* Add space above section titles */
+        }
+
+        h3 {
+            font-size: 1.4em;
+            color: var(--primary-color);
+        }
+
+        h4 {
+            font-size: 1.1em;
+            color: var(--secondary-color);
+            margin-bottom: 0.4em;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        section {
+            padding: 40px 0;
+        }
+
+        .alternate-bg {
+            background-color: var(--light-bg);
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--header-bg);
+            color: var(--light-text);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--light-text);
+            font-size: 2.5em; /* Slightly smaller than hero h1 */
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.1em;
+            color: var(--accent-color);
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            text-align: center;
+            padding: 50px 0 30px 0; /* More padding top */
+        }
+
+        #hero h2 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+        }
+
+        #hero p {
+            font-size: 1.2em;
+            max-width: 700px;
+            margin: 0 auto 1.5em auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 1em;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .version-info {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .hero-image {
+            max-width: 700px; /* Limit hero image size */
+            margin: 2em auto 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* --- Problem/Solution Section --- */
+        .columns {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .column {
+            flex: 1;
+            min-width: 280px; /* Prevent columns from becoming too narrow */
+            background-color: var(--light-text); /* White background for contrast */
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- Features Section --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+            gap: 25px;
+        }
+
+        .feature-item {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-item p {
+            font-size: 0.95em;
+            margin-bottom: 0;
+        }
+
+        /* --- Screenshots Section --- */
+        .screenshot-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 1.5em;
+        }
+
+        .screenshot-gallery figure {
+            margin: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            overflow: hidden; /* Keep image corners rounded */
+            background-color: var(--light-text);
+             box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+             text-align: center;
+        }
+
+        .screenshot-gallery img {
+            transition: transform 0.3s ease;
+        }
+        .screenshot-gallery img:hover {
+            transform: scale(1.03);
+        }
+
+        .screenshot-gallery figcaption {
+            padding: 10px;
+            font-size: 0.9em;
+            color: #555;
+            background-color: #fff; /* Ensure caption background is solid */
+        }
+
+        .image-note {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+            margin-top: 1em;
+        }
+
+        /* --- Getting Started Section --- */
+        #getting-started ol {
+            list-style-type: decimal;
+            padding-left: 20px;
+            max-width: 700px;
+            margin: 0 auto; /* Center the list */
+        }
+
+        #getting-started li {
+            margin-bottom: 0.8em;
+            font-size: 1.05em;
+        }
+
+        #getting-started strong {
+            color: var(--secondary-color);
+        }
+
+        /* --- CTA Bottom Section --- */
+        #cta-bottom {
+            text-align: center;
+        }
+
+        #cta-bottom h2 {
+            margin-bottom: 0.5em;
+        }
+
+        #cta-bottom p {
+            margin-bottom: 1.5em;
+            font-size: 1.1em;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--footer-bg);
+            color: #ccc; /* Lighter grey for footer text */
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        footer a:hover {
+            color: var(--light-text);
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.4em;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            .columns {
+                flex-direction: column; /* Stack columns */
+            }
+            .hero-image {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.6em;
+            }
+            #hero p {
+                font-size: 1.1em;
+            }
+            .cta-button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            section {
+                padding: 30px 0;
+            }
+            .feature-grid, .screenshot-gallery {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>FlowRecall</h1>
+            <p>Never Lose Your Selection Again in Unity</p>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h2>Stop Wasting Time Refinding Objects</h2>
+                <p>FlowRecall is a powerful, dockable Unity Editor window that remembers your GameObject & Asset selection history, letting you focus on your workflow.</p>
+                <a href="YOUR_ASSET_STORE_LINK_HERE" target="_blank" class="cta-button">Get FlowRecall on the Asset Store</a>
+                <!-- Replace YOUR_ASSET_STORE_LINK_HERE with your actual Asset Store URL when available -->
+                 <p class="version-info">Current Version: 1.0.0</p>
+                 <img src="images/placeholder-main-window.png" alt="FlowRecall Main Window" class="hero-image">
+            </div>
+        </section>
+
+        <section id="problem-solution" class="alternate-bg">
+            <div class="container">
+                 <h2>The Problem vs. The Solution</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h3>Frustration</h3>
+                        <p>Constantly switching between Scene and Project views? Select an object, get distracted, and waste precious minutes trying to find it again? This context-switching friction slows you down.</p>
+                    </div>
+                    <div class="column">
+                        <h3>FlowRecall</h3>
+                        <p>FlowRecall acts like your editor's short-term memory. It automatically logs selections, providing an instant, filterable list to jump back to exactly what you need, keeping you in the flow.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2>Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>Automatic History</h4>
+                        <p>Seamlessly tracks GameObject and Asset selections.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>Favorites/Pinning</h4>
+                        <p>Pin crucial items for permanent, quick access (persists restarts).</p>
+                    </div>
+                     <div class="feature-item">
+                        <h4>Filtering & Search</h4>
+                        <p>Instantly find items by name, type, or path. Tabs for History/Favorites.</p>
+                    </div>
+                     <div class="feature-item">
+                        <h4>Context Actions</h4>
+                        <p>Right-click for Select, Ping, Open, Duplicate, Delete, Copy Path/GUID & more.</p>
+                    </div>
+                     <div class="feature-item">
+                        <h4>Drag & Drop</h4>
+                        <p>Drag items directly from history to the scene or Inspector fields.</p>
+                    </div>
+                     <div class="feature-item">
+                        <h4>Customizable UI</h4>
+                        <p>Adjust history size, display density (Small/Medium), and behavior.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="screenshots" class="alternate-bg">
+             <div class="container">
+                <h2>See it in Action</h2>
+                <div class="screenshot-gallery">
+                    <figure>
+                        <img src="images/placeholder-main-window.png" alt="FlowRecall Main Window">
+                        <figcaption>Main History View</figcaption>
+                    </figure>
+                     <figure>
+                        <img src="images/placeholder-favorites.png" alt="FlowRecall Favorites Tab">
+                         <figcaption>Pinned Favorites</figcaption>
+                    </figure>
+                     <figure>
+                        <img src="images/placeholder-context-menu.png" alt="FlowRecall Context Menu">
+                         <figcaption>Quick Actions Menu</figcaption>
+                    </figure>
+                     <figure>
+                        <img src="images/placeholder-settings.png" alt="FlowRecall Settings Panel">
+                         <figcaption>Settings Panel</figcaption>
+                    </figure>
+                </div>
+                 <p class="image-note">Replace these placeholder images with your actual screenshots!</p>
+            </div>
+        </section>
+
+         <section id="getting-started">
+            <div class="container">
+                <h2>Get Started Easily</h2>
+                <ol>
+                    <li><strong>Download:</strong> Get the package from the <a href="YOUR_ASSET_STORE_LINK_HERE" target="_blank">Unity Asset Store</a>.</li> <!-- Update Link -->
+                    <li><strong>Import:</strong> Use `Assets -> Import Package -> Custom Package...` in Unity.</li>
+                    <li><strong>Open:</strong> Find the window via `Window -> FlowRecall -> Selection History`.</li>
+                    <li><strong>Dock & Use:</strong> Dock it anywhere and start selecting!</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="cta-bottom" class="alternate-bg">
+            <div class="container">
+                 <h2>Ready to Improve Your Workflow?</h2>
+                 <p>Stop losing your place and start working faster with FlowRecall.</p>
+                 <a href="YOUR_ASSET_STORE_LINK_HERE" target="_blank" class="cta-button">View on Unity Asset Store</a> <!-- Update Link -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HyperLumin. All Rights Reserved.</p> <!-- Update Year/Name if needed -->
+            <p>
+                <a href="YOUR_GITHUB_REPO_LINK_HERE" target="_blank">GitHub Repository</a> |
+                <a href="YOUR_GITHUB_ISSUES_LINK_HERE" target="_blank">Report an Issue</a>
+                <!-- Replace YOUR_GITHUB... links -->
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
